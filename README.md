@@ -7,15 +7,25 @@ no se necesitan paquetes npm, base de datos ni servicios de pago.
 
 ## Acceso y vista previa
 
-Desde PowerShell en tu equipo:
+La vista previa está siempre disponible en la red local:
+
+http://192.168.40.54:18135
+
+El servicio escucha únicamente en la IP LAN del servidor y en 127.0.0.1.
+Desde equipos conectados a esa red no hace falta abrir un túnel SSH.
+No se configuró publicación de este puerto en Internet.
+La dirección LAN está asignada por DHCP: reservar 192.168.40.54 para ai-server
+conserva este enlace. Si cambia, actualizar `ops/monchos-preview.service`,
+instalar la plantilla en `~/.config/systemd/user/` y reiniciar el servicio.
+
+Como alternativa mediante SSH desde PowerShell:
 
 ```powershell
 ssh -N -L 18135:127.0.0.1:18135 ai-server-codex
 ```
 
 Mantén esa terminal abierta y visita http://localhost:18135.
-El alias SSH existente usa el puerto 2222. La vista previa solo escucha en
-127.0.0.1 del servidor y requiere el túnel autenticado.
+El alias SSH existente usa el puerto 2222.
 Para editar, usa VS Code Remote SSH con `ai-server-codex` y abre la carpeta
 anterior, o entra con `ssh ai-server-codex`.
 

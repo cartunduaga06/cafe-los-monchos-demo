@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=%h/dev/cafe-los-monchos-pages-standalone
-ExecStart=/usr/bin/python3 %h/dev/cafe-los-monchos-pages-standalone/scripts/dev.py
+ExecStart=/usr/bin/python3 %h/dev/cafe-los-monchos-pages-standalone/scripts/dev.py --bind 127.0.0.1 --bind 192.168.40.54
 Restart=on-failure
 RestartSec=3
 NoNewPrivileges=true
