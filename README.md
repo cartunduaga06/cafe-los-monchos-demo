@@ -1,0 +1,77 @@
+# Moncho’s Coffie — desarrollo en ai-server
+
+El entorno de desarrollo vive en `ai-server`, en
+`/home/carlos/dev/cafe-los-monchos-pages-standalone`.
+Sitio estático HTML/CSS/JS. Python 3.14, Node 22 y Make ya están instalados;
+no se necesitan paquetes npm, base de datos ni servicios de pago.
+
+## Acceso y vista previa
+
+Desde PowerShell en tu equipo:
+
+```powershell
+ssh -N -L 18135:127.0.0.1:18135 ai-server-codex
+```
+
+Mantén esa terminal abierta y visita http://localhost:18135.
+El alias SSH existente usa el puerto 2222. La vista previa solo escucha en
+127.0.0.1 del servidor y requiere el túnel autenticado.
+Para editar, usa VS Code Remote SSH con `ai-server-codex` y abre la carpeta
+anterior, o entra con `ssh ai-server-codex`.
+
+## Trabajar y publicar
+
+En la terminal del servidor:
+
+```bash
+cd /home/carlos/dev/cafe-los-monchos-pages-standalone
+git switch develop
+git fetch origin
+git merge --ff-only origin/main
+# Editar index.html, styles.css, app.js o assets/; recargar la vista previa.
+make check
+# Revisar visualmente en escritorio y móvil.
+git add index.html styles.css app.js assets/
+git commit -m "Describe el cambio"
+make publish
+```
+
+`make publish` requiere un árbol limpio, valida los recursos, arma `dist/`,
+respalda la rama en GitHub y avanza `main` únicamente mediante fast-forward.
+Si `main` cambió, se detiene para que integres esos cambios.
+La publicación es explícita: guardar archivos o hacer commit no publica.
+También se pueden usar ramas `feature/...` y pull requests hacia `main`.
+
+GitHub Actions valida cada push y pull request hacia main; publica únicamente
+los pushes a main que pasan la validación. El artefacto contiene solo
+`index.html`, `styles.css`, `app.js`, `.nojekyll` y los medios admitidos de
+`assets/`; no incluye scripts, documentación ni metadatos del repositorio.
+El repositorio es público: no guardar secretos en ningún archivo versionado.
+
+Sitio público: https://cartunduaga06.github.io/cafe-los-monchos-demo/
+Despliegues: https://github.com/cartunduaga06/cafe-los-monchos-demo/actions/workflows/pages.yml
+
+## Comandos y servicio
+
+- `make check`: sintaxis JS, archivos, referencias y anclas HTML.
+- `make build`: valida y genera dist/.
+- `make dev`: vista previa manual si el servicio está detenido.
+- `make status`: estado Git.
+- `systemctl --user status monchos-preview`: estado del servicio persistente.
+- `systemctl --user restart monchos-preview`: reinicio.
+- `journalctl --user -u monchos-preview -n 40`: registros.
+
+El servicio arranca con el gestor de usuario; linger está habilitado para
+mantenerlo activo después de cerrar SSH y tras reiniciar el servidor.
+Su plantilla versionada está en `ops/monchos-preview.service`.
+
+## Recuperación
+
+Para deshacer una publicación, crear una rama desde origin/main, ejecutar
+`git revert <commit>` y publicar con `make publish`. Así se conserva el historial.
+El respaldo inicial del repositorio y la configuración anterior de Pages están
+fuera del repositorio, en `~/.local/state/monchos-development/`.
+
+GitHub Pages se configura con `build_type: workflow` para que la validación
+controle la publicación. Referencia:
+https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages
